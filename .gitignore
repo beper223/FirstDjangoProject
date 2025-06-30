@@ -1,0 +1,12 @@
+.idea/
+__pycache__/
+/MySQL/conn.txt
+/MySQL/priority.txt
+/MySQL/модель.mwb
+*local_settings.py
+
+# environment
+.env*
+.venv/
+venv/
+ENV/
