@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     # local
     'src.firstapp.apps.FirstappConfig',
+    'src.library.apps.LibraryConfig',
 ]
 
 MIDDLEWARE = [
@@ -61,7 +62,7 @@ MIDDLEWARE = [
     'src.firstapp.middleware.CustomMiddleware',
 ]
 
-ROOT_URLCONF = 'MyDjangoProject.urls'
+ROOT_URLCONF = 'core.urls'
 
 TEMPLATES = [
     {
@@ -79,7 +80,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'MyDjangoProject.wsgi.application'
+WSGI_APPLICATION = 'core.wsgi.application'
 
 
 # Database
