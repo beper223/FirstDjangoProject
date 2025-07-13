@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     # local
     'src.firstapp.apps.FirstappConfig',
     'src.library.apps.LibraryConfig',
+    'src.taskmanager.apps.TaskmanagerConfig',
 ]
 
 MIDDLEWARE = [
