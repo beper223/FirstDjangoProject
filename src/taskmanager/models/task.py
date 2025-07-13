@@ -11,8 +11,15 @@ STATUS_CHOICES = [
 class Category(models.Model):
     name = models.CharField(max_length=100)
 
+    class Meta:
+        unique_together = ('name', )
+        db_table = "task_manager_category"
+        verbose_name = "Category"
+        verbose_name_plural = "Categories"
+
     def __str__(self):
         return self.name
+
 
 class BaseTask(models.Model):
     title = models.CharField(
@@ -45,11 +52,11 @@ class Task(BaseTask):
         auto_now_add=True
     )
     class Meta:
-        # Из условия:
-        # title: Название задачи. Уникально для даты.
-        # В условии не сказано, для какой именно даты, поэтому берем пока created_date
-        # К тому же непонятно, как из поля "дата+время" получить дату и подставить ее в unique_together
-        unique_together = ('title', 'created_date')
+        unique_together = ('title',)
+        db_table = "task_manager_task"
+        verbose_name = "Task"
+        verbose_name_plural = "Tasks"
+        ordering = ['-created_at', 'title']
 
 class SubTask(BaseTask):
     task = models.ForeignKey(
@@ -57,4 +64,10 @@ class SubTask(BaseTask):
         on_delete=models.CASCADE,
         related_name="subtasks",
     )
+    class Meta:
+        unique_together = ('title', 'task')
+        db_table = "task_manager_subtask"
+        verbose_name = "SubTask"
+        verbose_name_plural = "SubTasks"
+        ordering = ['-created_at', 'title']
 
