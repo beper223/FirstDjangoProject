@@ -1,3 +1,5 @@
+from typing import Optional
+
 from django.utils import timezone
 from django.db.models import Count
 from django.db.models.functions import ExtractWeekDay
@@ -26,14 +28,35 @@ class TaskListCreateView(APIView):
 
 
 class TaskDetailView(APIView):
-    def get(self, request: Request, task_id: int) -> Response:
+    def get_object(self, task_id: int) -> Optional[Task]:
         try:
-            task = Task.objects.get(pk=task_id)
+            return Task.objects.get(pk=task_id)
         except Task.DoesNotExist:
+            return None
+
+    def get(self, request: Request, task_id: int) -> Response:
+        task = self.get_object(task_id)
+        if task is None:
             return Response({'error': 'Task not found'}, status=status.HTTP_404_NOT_FOUND)
         serializer = TaskDetailSerializer(task)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+    def update(self, request: Request, task_id: int, partial: bool = False) -> Response:
+        task = self.get_object(task_id)
+        if task is None:
+            return Response({'error': 'Task not found'}, status=status.HTTP_404_NOT_FOUND)
+
+        serializer = TaskDetailSerializer(task, data=request.data, partial=partial)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def put(self, request: Request, task_id: int) -> Response:
+        return self.update(request, task_id)
+
+    def patch(self, request: Request, task_id: int) -> Response:
+        return self.update(request, task_id, partial=True)
 
 class TaskStatisticsView(APIView):
     def get(self, request: Request) -> Response:

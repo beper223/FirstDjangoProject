@@ -14,7 +14,17 @@ class SubTaskListCreateView(APIView):
     def get(self, request):
         paginator = PageNumberPagination()
         paginator.page_size = 5
+
         subtasks = SubTask.objects.all().order_by('-created_at')
+
+        task_title = request.query_params.get('task_title')
+        status_param = request.query_params.get('status')
+
+        if task_title:
+            subtasks = subtasks.filter(task__title=task_title)
+        if status_param:
+            subtasks = subtasks.filter(status=status_param)
+
         result_page = paginator.paginate_queryset(subtasks, request)
         serializer = SubTaskSerializer(result_page, many=True)
         return paginator.get_paginated_response(serializer.data)
