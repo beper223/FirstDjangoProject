@@ -46,7 +46,9 @@ INSTALLED_APPS = [
     'src.firstapp.apps.FirstappConfig',
     'src.library.apps.LibraryConfig',
     'src.taskmanager.apps.TaskmanagerConfig',
+    # third-party
     'rest_framework',
+    'django_filters',
 ]
 
 MIDDLEWARE = [

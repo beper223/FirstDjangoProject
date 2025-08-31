@@ -1,9 +1,15 @@
-from typing import Optional
-
 from django.utils import timezone
 from django.db.models import Count
 from django.db.models.functions import ExtractWeekDay
-from rest_framework import status
+from rest_framework import (
+    status,
+    filters
+)
+from rest_framework.generics import (
+    ListCreateAPIView,
+    RetrieveUpdateDestroyAPIView
+)
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.request import Request
@@ -12,51 +18,23 @@ from src.taskmanager.dtos.task import TaskCreateSerializer, TaskListSerializer, 
 from src.taskmanager.models import Task, STATUS_CHOICES
 
 
-class TaskListCreateView(APIView):
-    def get(self, request: Request) -> Response:
-        tasks = Task.objects.all()
-        serializer = TaskListSerializer(tasks, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+class TaskListCreateView(ListCreateAPIView):
+    queryset = Task.objects.all()
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
+    filterset_fields = ['status', 'deadline']
+    search_fields = ['title', 'description']
+    ordering_fields = ['created_at']
 
-    def post(self, request: Request) -> Response:
-        serializer = TaskCreateSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        else:
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    def get_serializer_class(self):
+        if self.request.method == 'POST':
+            return TaskCreateSerializer
+        return TaskListSerializer
 
 
-class TaskDetailView(APIView):
-    def get_object(self, task_id: int) -> Optional[Task]:
-        try:
-            return Task.objects.get(pk=task_id)
-        except Task.DoesNotExist:
-            return None
+class TaskDetailView(RetrieveUpdateDestroyAPIView):
+    queryset = Task.objects.all()
+    serializer_class = TaskDetailSerializer
 
-    def get(self, request: Request, task_id: int) -> Response:
-        task = self.get_object(task_id)
-        if task is None:
-            return Response({'error': 'Task not found'}, status=status.HTTP_404_NOT_FOUND)
-        serializer = TaskDetailSerializer(task)
-        return Response(serializer.data, status=status.HTTP_200_OK)
-
-    def update(self, request: Request, task_id: int, partial: bool = False) -> Response:
-        task = self.get_object(task_id)
-        if task is None:
-            return Response({'error': 'Task not found'}, status=status.HTTP_404_NOT_FOUND)
-
-        serializer = TaskDetailSerializer(task, data=request.data, partial=partial)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    def put(self, request: Request, task_id: int) -> Response:
-        return self.update(request, task_id)
-
-    def patch(self, request: Request, task_id: int) -> Response:
-        return self.update(request, task_id, partial=True)
 
 class TaskStatisticsView(APIView):
     def get(self, request: Request) -> Response:
