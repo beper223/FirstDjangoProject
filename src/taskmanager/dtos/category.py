@@ -2,10 +2,14 @@ from rest_framework import serializers
 from src.taskmanager.models import Category
 
 
-class CategoryCreateSerializer(serializers.ModelSerializer):
+class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
-        fields = ('name',)
+        fields = (
+            'id',
+            'name',
+        )
+        read_only_fields = ('id',)
 
     def validate_name(self, value):
         qs = Category.objects.filter(name__iexact=value)

@@ -1,4 +1,3 @@
-from django.utils import timezone
 from rest_framework import serializers
 from src.taskmanager.models import Task
 from src.taskmanager.dtos.subtask import SubTaskSerializer
@@ -14,6 +13,7 @@ class TaskCreateSerializer(serializers.ModelSerializer):
             'description',
             'status',
             'deadline',
+            'category',
         )
 
 class TaskListSerializer(serializers.ModelSerializer):
@@ -24,6 +24,7 @@ class TaskListSerializer(serializers.ModelSerializer):
             'title',
             'status',
             'deadline',
+            'category',
         )
 
 class TaskDetailSerializer(serializers.ModelSerializer):
