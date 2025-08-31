@@ -10,6 +10,8 @@ STATUS_CHOICES = [
 
 class Category(models.Model):
     name = models.CharField(max_length=100)
+    is_deleted = models.BooleanField(default=False)
+    deleted_at = models.DateTimeField(null=True, blank=True)
 
     class Meta:
         unique_together = ('name', )
@@ -45,11 +47,15 @@ class BaseTask(models.Model):
         return self.title
 
 class Task(BaseTask):
-    categories = models.ManyToManyField(
-        'Category',
-        related_name='tasks')
     created_date = models.DateField(
         auto_now_add=True
+    )
+    category = models.ForeignKey(
+        Category,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='tasks'
     )
     class Meta:
         unique_together = ('title',)
@@ -70,4 +76,3 @@ class SubTask(BaseTask):
         verbose_name = "SubTask"
         verbose_name_plural = "SubTasks"
         ordering = ['-created_at', 'title']
-
