@@ -1,8 +1,13 @@
-from src.taskmanager.views.task import new_task, view_task, get_all_tasks, task_statistics
+from src.taskmanager.views.task import (
+    TaskListCreateView,
+    TaskDetailView,
+    TaskStatisticsView,
+    TasksByWeekdayView,
+)
 
 __all__ = (
-    'new_task',
-    'view_task',
-    'get_all_tasks',
-    'task_statistics'
+    'TaskListCreateView',
+    'TaskDetailView',
+    'TaskStatisticsView',
+    'TasksByWeekdayView',
 )
