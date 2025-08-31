@@ -1,6 +1,7 @@
+from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework import status
+from rest_framework.pagination import PageNumberPagination
 
 from src.taskmanager.models import SubTask
 from src.taskmanager.dtos.subtask import (
@@ -11,9 +12,12 @@ from src.taskmanager.dtos.subtask import (
 
 class SubTaskListCreateView(APIView):
     def get(self, request):
-        subtasks = SubTask.objects.all()
-        serializer = SubTaskSerializer(subtasks, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        paginator = PageNumberPagination()
+        paginator.page_size = 5
+        subtasks = SubTask.objects.all().order_by('-created_at')
+        result_page = paginator.paginate_queryset(subtasks, request)
+        serializer = SubTaskSerializer(result_page, many=True)
+        return paginator.get_paginated_response(serializer.data)
 
     def post(self, request):
         serializer = SubTaskCreateSerializer(data=request.data)
