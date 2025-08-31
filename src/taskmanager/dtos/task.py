@@ -1,5 +1,6 @@
+from django.utils import timezone
 from rest_framework import serializers
-from src.taskmanager.models import Task, SubTask, Category
+from src.taskmanager.models import Task
 from src.taskmanager.dtos.subtask import SubTaskSerializer
 
 
@@ -12,6 +13,11 @@ class TaskCreateSerializer(serializers.ModelSerializer):
             'status',
             'deadline',
         )
+
+        def validate_deadline(self, value):
+            if value < timezone.now():
+                raise serializers.ValidationError("Deadline не может быть в прошлом.")
+            return value
 
 class TaskListSerializer(serializers.ModelSerializer):
     class Meta:
