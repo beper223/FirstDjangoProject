@@ -9,9 +9,10 @@ from src.taskmanager.dtos.category import CategorySerializer
 
 
 class CategoryViewSet(ModelViewSet):
-
-    queryset = Category.objects.filter(is_deleted=False)
     serializer_class = CategorySerializer
+
+    def get_queryset(self):
+        return Category.objects.filter(is_deleted=False)
 
     def perform_destroy(self, instance):
         instance.is_deleted = True
