@@ -11,3 +11,8 @@ class SubTaskCreateSerializer(serializers.ModelSerializer):
             'deadline',
         )
         read_only_fields = ('created_at',)
+
+class SubTaskSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = SubTask
+        fields = '__all__'
